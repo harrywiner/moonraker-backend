@@ -5,7 +5,7 @@ from api.src.ae_lib import get_sample_loss, find_zscore_anomalies
 
 from tensorflow.keras.models import load_model
 
-THRESHOLD = 0
+THRESHOLD = 0.4
 
 @api_view(['GET'])
 def getData(request):
