@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from api.src.format import deserialize_input, map_aggregates_to_samples
+from api.src.format import deserialize_input, map_aggregates_to_samples, is_valid_input
 from api.src.ae_lib import get_sample_loss, find_zscore_anomalies
 
 from tensorflow.keras.models import load_model
@@ -16,8 +16,11 @@ def getData(request):
 def findAnomalies(request):
     payload = request.data
     
+    # Clean data
+    clean_payload = list(filter(is_valid_input, payload))
+    
     # deserialize data
-    devices = [deserialize_input(obj) for obj in payload]
+    devices = [deserialize_input(obj) for obj in clean_payload]
     
     # format and reshape data
     input_data = map_aggregates_to_samples(devices)
