@@ -3,7 +3,6 @@ from typing import List
 import numpy as np
 
 def deserialize_input(obj: dict) -> AggregateDevice:
-    
     return AggregateDevice(
             deviceID=obj["deviceID"], 
             LatencyAvg=obj["LatencyAvg"], 

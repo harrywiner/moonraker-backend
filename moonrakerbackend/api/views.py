@@ -5,7 +5,7 @@ from api.src.ae_lib import get_sample_loss, find_zscore_anomalies
 
 from tensorflow.keras.models import load_model
 
-THRESHOLD = 0.4
+THRESHOLD = 0.12
 
 @api_view(['GET'])
 def getData(request):
@@ -36,8 +36,14 @@ def findAnomalies(request):
     
     # filter original data
     anomalies = []
-    for (is_anomaly, obj) in zip(is_anomaly_list, payload):
+    normal = []
+    for (is_anomaly, obj) in zip(is_anomaly_list, clean_payload):
         if is_anomaly:
             anomalies.append(obj)
-    
-    return Response(anomalies)
+        else:
+            normal.append(obj)
+    res_dict = {
+        "anomalies": anomalies,
+        "functioning": normal
+    }
+    return Response(res_dict)
