@@ -9,7 +9,13 @@ THRESHOLD = 0.12
 
 @api_view(['GET'])
 def getData(request):
-    person = {'name':"John", 'age': 21}
+    
+    if 'name' not in request.query_params.keys():
+        person = {'name':"Joyce Lee", 'age': 22}
+    else:
+        name = request.query_params['name']
+        person = {'name':name, 'age': 69}
+
     return Response(person)
 
 @api_view(['POST'])
@@ -47,3 +53,8 @@ def findAnomalies(request):
         "functioning": normal
     }
     return Response(res_dict)
+
+@api_view(['GET'])
+def rulPredictor(request):
+    #get parameter for t for cycles
+    pass
