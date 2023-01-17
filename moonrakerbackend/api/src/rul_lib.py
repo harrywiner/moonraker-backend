@@ -48,11 +48,11 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
         predict = np.array(model.predict(x))
 
         rated_cap = x[0, 0]
-        eol_actual = rated_cap *.8
+        # eol_actual = rated_cap *.8
 
         actual_full = np.concatenate((x[cycle], y[cycle]))
         predict_full = np.concatenate((x[cycle], predict[cycle]))
 
-        eol_i_predict, eol_i_actual, eol_actual= calculate_eol(predict_full, actual_full, x)
+        eol_i_predict, eol_i_actual, _= calculate_eol(predict_full, actual_full, x)
     
     return x[cycle], y[cycle], predict[cycle], eol_i_predict, eol_i_actual, backward_indices, forward_indices

@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from api.src.format import deserialize_input, map_aggregates_to_samples, is_valid_input
 from api.src.ae_lib import get_sample_loss, find_zscore_anomalies
-from api.src.cap_lib import get_capacities, load_battery_files, extract_battery_features
+from api.src.cap_lib import get_capacities, load_battery_files, extract_battery_features, get_predicted_capacities
 from api.src.rul_lib import get_predicted_capacity_feature, get_prediction_at_single_cycle
 
 from tensorflow.keras.models import load_model
@@ -79,7 +79,7 @@ def findRUL(request):
     cap_lstm = load_model('moonrakerbackend/api/models/CAP_DNN_test5.h5')
     
     # get predict set
-    predict_set = get_capacities(cap_lstm, battery_features, capacities)
+    predict_set = get_predicted_capacities(cap_lstm, battery_features, capacities)
 
     # get predicted forward and backward
     backward, forward = get_predicted_capacity_feature(predict_set, 20, 20)
