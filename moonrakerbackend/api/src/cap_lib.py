@@ -92,8 +92,8 @@ def get_all_cycles_range_above(times, voltages, threshold=3):
 
 ### 7. Discharging Time
 def get_actives(variable):
-    warnings.filterwarnings("ignore")
-    model = KMeans(2).fit(variable.reshape(len(variable),1))
+    # warnings.filterwarnings("ignore")
+    model = KMeans(2, n_init = 10).fit(variable.reshape(len(variable),1))
     
     if abs(model.cluster_centers_[0][0]) > abs(model.cluster_centers_[1][0]):
         return [True if e == 0 else False for e in model.labels_]
@@ -174,7 +174,6 @@ def extract_battery_features(batteries):
         times = get_time(bat)
         voltages = get_voltages(bat)
         cur = get_current(bat)
-        # cap = get_capacities(bat)
         
         # Feature Extraction
         max_initials = get_all_cycles_max_initial_slope(times, voltages)
@@ -193,7 +192,7 @@ def extract_battery_features(batteries):
         
     return output
 
-def get_capacities(model, xs, ys, bat_names=["BAT 05", "BAT 06", "BAT 07", "BAT 18"]):
+def get_predicted_capacities(model, xs, ys, bat_names=["BAT 05", "BAT 06", "BAT 07", "BAT 18"]):
     predict_full_set = []
     for x, y, name in zip(xs, ys, bat_names):
         predict = np.array(model.predict(x)).flatten()
@@ -201,5 +200,16 @@ def get_capacities(model, xs, ys, bat_names=["BAT 05", "BAT 06", "BAT 07", "BAT 
 
     return predict_full_set
 
+def get_capacities(raw):
+    """Get all capacities for all cycles
+
+    Args:
+        raw (List): raw Bat file after subscripting, ex read_file['B0005']
+
+    Returns:
+        List: Shape (cycles, 1)
+    """
+    discharges = list(filter(lambda e: e[0][0] == "discharge",raw[0][0][0][0]))
+    return [e[3][0][0][6][0] for e in discharges]
 
 
