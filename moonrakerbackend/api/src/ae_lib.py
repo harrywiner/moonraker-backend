@@ -10,6 +10,9 @@ def get_sample_loss(xs, model):
     Returns:
         List[float]: returns the reconstruction losses of the elements with preserved indices
     """
+
+    if len(xs) == 0:
+        return []
     predict = model.predict(xs)
     predict = predict.reshape(predict.shape[0], predict.shape[2])
     xs_out = xs.reshape(xs.shape[0], xs.shape[2])
