@@ -8,6 +8,10 @@ from api.src.rul_lib import get_predicted_capacity_feature, get_prediction_at_si
 from tensorflow.keras.models import load_model
 import numpy as np
 
+raw = load_battery_files()
+battery_features = extract_battery_features(raw)
+capacities = [get_capacities(bat) for bat in raw]
+
 THRESHOLD = 0.12
 
 @api_view(['GET'])
@@ -64,16 +68,14 @@ def rulPredictor(request):
 @api_view(['POST'])
 def findRUL(request):
     # Clean data
-    raw = load_battery_files()
-    battery_features = extract_battery_features(raw)
-    capacities = [get_capacities(bat) for bat in raw]
+    
 
     if 't' not in request.query_params.keys():
-        cycle = {'t': '90'}
+        cycle = 90
         
     else:
         t = request.query_params['t']
-        cycle = {'t': t }
+        cycle = t
     
     # load model
     cap_lstm = load_model('moonrakerbackend/api/models/CAP_DNN_test5.h5')
