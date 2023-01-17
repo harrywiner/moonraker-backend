@@ -23,3 +23,8 @@ This changes the signing settings as outlined in [this document](https:/go.micro
 Install requirements
 
 ```pip install -r requirements.txt```
+
+To sync the package, run
+
+```pip freeze > requirements.txt```
+
