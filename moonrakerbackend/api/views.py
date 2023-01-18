@@ -7,10 +7,12 @@ from api.src.rul_lib import get_predicted_capacity_feature, get_prediction_at_si
 
 from tensorflow.keras.models import load_model
 import numpy as np
+import pandas as pd
+import math
 
-raw = load_battery_files()
-battery_features = extract_battery_features(raw)
-capacities = [get_capacities(bat) for bat in raw]
+# raw = load_battery_files()
+# battery_features = extract_battery_features(raw)
+# capacities = [get_capacities(bat) for bat in raw]
 
 THRESHOLD = 0.12
 
@@ -72,13 +74,23 @@ def findRUL(request):
         
     else:
         t = request.query_params['t']
-        cycle = t
+        cycle = int(t)
     
     # load model
-    cap_lstm = load_model('moonrakerbackend/api/models/CAP_DNN_test5.h5')
+    # cap_lstm = load_model('moonrakerbackend/api/models/CAP_DNN_test5.h5')
     
     # get predict set
-    predict_set = get_predicted_capacities(cap_lstm, battery_features, capacities)
+    # predict_set = get_predicted_capacities(cap_lstm, battery_features, capacities)
+
+    deserialised_data = pd.read_csv('./data/predicted_capacities.csv').to_numpy()
+    deserialised_data = np.float32(deserialised_data)
+
+    cleaned_bat18 = [x for x in deserialised_data[3] if (math.isnan(x) != True)]
+
+    predict_set = []
+    for i in deserialised_data[:3]:
+        predict_set.append(i)
+    predict_set.append(cleaned_bat18)
 
     # get predicted forward and backward
     backward, forward = get_predicted_capacity_feature(predict_set, 20, 20)
