@@ -67,9 +67,6 @@ def rulPredictor(request):
 
 @api_view(['POST'])
 def findRUL(request):
-    # Clean data
-    
-
     if 't' not in request.query_params.keys():
         cycle = 90
         
@@ -90,17 +87,15 @@ def findRUL(request):
     rul_lstm = load_model('moonrakerbackend/api/models/RUL_LSTM_test10.h5')
     
     # find prediction
-    actual_input, actual, predict, eol_i_predict, eol_i_actual, backward_indices, forward_indices = get_prediction_at_single_cycle(rul_lstm, backward, forward, cycle = cycle)
-    
-    x_indices = np.concatenate((backward_indices, forward_indices))
-    y_actual = np.concatenate((actual_input, actual))
-    y_predicted = np.concatenate((actual_input, predict))
-    
+    x_indices, y_actual_all, y_predicted_all, eol_i_actual_all, eol_i_predict_all, name_all, eol_actual_all = get_prediction_at_single_cycle(rul_lstm, backward, forward, cycle = cycle)
+
     res_dict = {
-        "predicted": y_predicted,
-        "actual": y_actual,
+        "predicted": y_predicted_all,
+        "actual": y_actual_all,
         "x_indices" : x_indices,
-        "eol_i_predict" : eol_i_predict,
-        "eol_i_actual" : eol_i_actual
+        "eol_i_predict" : eol_i_predict_all,
+        "eol_i_actual" : eol_i_actual_all,
+        "batteries" : name_all, 
+        "eol_value" : eol_actual_all
     }
     return Response(res_dict)
