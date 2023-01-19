@@ -2,13 +2,12 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from api.src.format import deserialize_input, map_aggregates_to_samples, is_valid_input
 from api.src.ae_lib import get_sample_loss, find_zscore_anomalies
-from api.src.cap_lib import get_capacities, load_battery_files, extract_battery_features, get_predicted_capacities
+from api.src.cap_lib import clean_data
 from api.src.rul_lib import get_predicted_capacity_feature, get_prediction_at_single_cycle
 
 from tensorflow.keras.models import load_model
 import numpy as np
 import pandas as pd
-import math
 
 # raw = load_battery_files()
 # battery_features = extract_battery_features(raw)
@@ -82,15 +81,11 @@ def findRUL(request):
     # get predict set
     # predict_set = get_predicted_capacities(cap_lstm, battery_features, capacities)
 
-    deserialised_data = pd.read_csv('./data/predicted_capacities.csv').to_numpy()
-    deserialised_data = np.float32(deserialised_data)
+    # deserialize data
+    deserialized_data = pd.read_csv('./data/predicted_capacities.csv').to_numpy()
 
-    cleaned_bat18 = [x for x in deserialised_data[3] if (math.isnan(x) != True)]
-
-    predict_set = []
-    for i in deserialised_data[:3]:
-        predict_set.append(i)
-    predict_set.append(cleaned_bat18)
+    # clean data
+    predict_set = clean_data(deserialized_data)
 
     # get predicted forward and backward
     backward, forward = get_predicted_capacity_feature(predict_set, 20, 20)

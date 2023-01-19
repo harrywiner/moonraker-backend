@@ -3,7 +3,6 @@ Running
 
 `python moonrakerbackend/manage.py runserver`
 
-
 ## Virtualenv
 Setting up
 
