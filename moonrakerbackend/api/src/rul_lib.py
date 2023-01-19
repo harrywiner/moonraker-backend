@@ -44,6 +44,7 @@ def calculate_eol(predict_y, actual_y, actual_x):
 def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06", "BAT 07", "BAT 18"], cycle = 0, lookback = 20, forward = 20):
     y_actual_all = []
     y_predicted_all = [] 
+    past_all = []
     eol_i_actual_all = []
     eol_i_predict_all = []
     eol_actual_all = []
@@ -59,17 +60,19 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
         eol_i_actual, eol_i_predict, eol_actual = calculate_eol_index(predict_full, actual_full, x, 0, cycle)
 
         x_indices = np.concatenate((backward_indices, forward_indices))
-        y_actual = np.concatenate((x[cycle], y[cycle]))
-        y_predicted = np.concatenate((x[cycle], predict[cycle]))
+        y_actual = y[cycle]
+        y_predicted = predict[cycle]
+        past = x[cycle]
 
         y_actual_all.append(y_actual)
         y_predicted_all.append(y_predicted) 
+        past_all.append(past)
         eol_i_actual_all.append(eol_i_actual)
         eol_i_predict_all.append(eol_i_predict)
         name_all.append(name)
         eol_actual_all.append(eol_actual)
 
-    return x_indices, y_actual_all, y_predicted_all, eol_i_actual_all, eol_i_predict_all, name_all, eol_actual_all
+    return x_indices, y_actual_all, y_predicted_all, past_all, eol_i_actual_all, eol_i_predict_all, name_all, eol_actual_all
 
 def calculate_eol_index(predict_y, actual_y, actual_x, lookback, index):
     eol_i_predict, eol_i_actual, eol_actual= calculate_eol(predict_y, actual_y, actual_x)
