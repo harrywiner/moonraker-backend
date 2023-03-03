@@ -50,7 +50,7 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
     eol_actual_all = []
     name_all = []
     for x, y, name in zip(xs, ys, bat_names):
-        backward_indices = [i for i in range(cycle, lookback+cycle)]
+        backward_indices = [i for i in range(lookback+cycle)]
         forward_indices = [i for i in range(lookback+cycle, lookback+forward+cycle)]
         predict = np.array(model.predict(x))
         
@@ -62,7 +62,11 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
         x_indices = np.concatenate((backward_indices, forward_indices))
         y_actual = y[cycle]
         y_predicted = predict[cycle]
-        past = x[cycle]
+
+        full_history = []
+        for i in x:
+            full_history.append(i[0])
+        past = full_history[0:cycle+lookback]
 
         y_actual_all.append(y_actual)
         y_predicted_all.append(y_predicted) 
