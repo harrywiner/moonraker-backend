@@ -30,10 +30,11 @@ def find_eol(vector, eol_actual):
         if (vector[i] > eol_actual and vector[i+1] < eol_actual):
             # print("First capacity that passes threshold:", vector[i])
             return i+1
-    return -1
+    # return -1 if in the future
+    return -1 
 
 def calculate_eol(predict_y, actual_y, actual_x):
-    rated_cap = actual_x[0, 0]
+    rated_cap = actual_x[0]
     eol_actual = rated_cap *.8
 
     eol_i_actual = find_eol(actual_y, eol_actual)
@@ -49,15 +50,11 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
     eol_i_predict_all = []
     eol_actual_all = []
     name_all = []
+    eol_bool_all = []
     for x, y, name in zip(xs, ys, bat_names):
         backward_indices = [i for i in range(lookback+cycle)]
         forward_indices = [i for i in range(lookback+cycle, lookback+forward+cycle)]
         predict = np.array(model.predict(x))
-        
-        actual_full = np.concatenate((x[cycle], y[cycle]))
-        predict_full = np.concatenate((x[cycle], predict[cycle]))
-
-        eol_i_actual, eol_i_predict, eol_actual = calculate_eol_index(predict_full, actual_full, x, 0, cycle)
 
         x_indices = np.concatenate((backward_indices, forward_indices))
         y_actual = y[cycle]
@@ -68,6 +65,12 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
             full_history.append(i[0])
         past = full_history[0:cycle+lookback]
 
+        actual_full = np.concatenate((past, y_actual))
+        predict_full = np.concatenate((past, y_predicted))
+
+        eol_i_actual, eol_i_predict, eol_actual = calculate_eol(predict_full, actual_full, past)
+        eol_bool = is_eol(past, eol_actual, y_actual)
+
         y_actual_all.append(y_actual)
         y_predicted_all.append(y_predicted) 
         past_all.append(past)
@@ -75,23 +78,13 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
         eol_i_predict_all.append(eol_i_predict)
         name_all.append(name)
         eol_actual_all.append(eol_actual)
+        eol_bool_all.append(eol_bool)
 
-    return x_indices, y_actual_all, y_predicted_all, past_all, eol_i_actual_all, eol_i_predict_all, name_all, eol_actual_all
+    return x_indices, y_actual_all, y_predicted_all, past_all, eol_i_actual_all, eol_i_predict_all, name_all, eol_actual_all, eol_bool_all
 
-def calculate_eol_index(predict_y, actual_y, actual_x, lookback, index):
-    eol_i_predict, eol_i_actual, eol_actual= calculate_eol(predict_y, actual_y, actual_x)
+def is_eol(past, eol_actual, actual_y):
+    # if the past contains eol_actual
+    if (past[-1] < eol_actual or (past[-1] > eol_actual and eol_actual > actual_y[0])):
+        return True
+    return False
 
-    if eol_i_actual == eol_i_predict and eol_i_actual != -1:
-        x = eol_i_actual + lookback + index 
-        return x, x, eol_actual
-    else:
-        if eol_i_actual != -1:  
-            y = eol_i_actual + lookback + index 
-        else:
-            y = -1
-        if eol_i_predict != -1:
-            z = eol_i_predict + lookback + index 
-        else:
-            z = -1
-        return y, z, eol_actual
-        

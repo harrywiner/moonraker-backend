@@ -94,7 +94,7 @@ def findRUL(request):
     rul_lstm = load_model('moonrakerbackend/api/models/RUL_LSTM_test10.h5')
     
     # find prediction
-    x_indices, y_actual_all, y_predicted_all, past_all, eol_i_actual_all, eol_i_predict_all, name_all, eol_actual_all = get_prediction_at_single_cycle(rul_lstm, backward, forward, cycle = cycle)
+    x_indices, y_actual_all, y_predicted_all, past_all, eol_i_actual_all, eol_i_predict_all, name_all, eol_actual_all, eol_bool_all = get_prediction_at_single_cycle(rul_lstm, backward, forward, cycle = cycle)
 
     res_dict = {
         "past_data" : past_all,
@@ -105,6 +105,7 @@ def findRUL(request):
         "eol_i_actual" : eol_i_actual_all,
         "batteries" : name_all, 
         "eol_value" : eol_actual_all,
+        "is_eol" : eol_bool_all,
         "x_units": "Charging cycles",
         "y_units": "Capacity"
     }
