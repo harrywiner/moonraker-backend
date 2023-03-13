@@ -51,19 +51,19 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
     eol_actual_all = []
     name_all = []
     eol_bool_all = []
-    for x, y, name in zip(xs, ys, bat_names):
-        backward_indices = [i for i in range(lookback+cycle)]
-        forward_indices = [i for i in range(lookback+cycle, lookback+forward+cycle)]
+    for x, y, name, c in zip(xs, ys, bat_names, cycle):
+        backward_indices = [i for i in range(lookback+c)]
+        forward_indices = [i for i in range(lookback+c, lookback+forward+c)]
         predict = np.array(model.predict(x))
 
         x_indices = np.concatenate((backward_indices, forward_indices))
-        y_actual = y[cycle]
-        y_predicted = predict[cycle]
+        y_actual = y[c]
+        y_predicted = predict[c]
 
         full_history = []
         for i in x:
             full_history.append(i[0])
-        past = full_history[0:cycle+lookback]
+        past = full_history[0:c+lookback]
 
         actual_full = np.concatenate((past, y_actual))
         predict_full = np.concatenate((past, y_predicted))
@@ -84,7 +84,7 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
 
 def is_eol(past, eol_actual, actual_y):
     # if the past contains eol_actual
-    if (past[-1] < eol_actual or (past[-1] > eol_actual and eol_actual > actual_y[0])):
+    if (past[-1] < eol_actual):
         return True
     return False
 

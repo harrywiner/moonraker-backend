@@ -8,6 +8,7 @@ from api.src.rul_lib import get_predicted_capacity_feature, get_prediction_at_si
 from tensorflow.keras.models import load_model
 import numpy as np
 import pandas as pd
+import ast
 
 # raw = load_battery_files()
 # battery_features = extract_battery_features(raw)
@@ -69,12 +70,14 @@ def rulPredictor(request):
 @api_view(['POST'])
 def findRUL(request):
     if 't' not in request.query_params.keys():
-        cycle = 90
-        
+        cycle = [90]*4
     else:
         t = request.query_params['t']
-        cycle = int(t)
-    
+        if t.isnumeric() == True:
+            cycle = [int(t)]*4
+        else:
+            cycle = ast.literal_eval(t)
+
     # load model
     # cap_lstm = load_model('moonrakerbackend/api/models/CAP_DNN_test5.h5')
     
@@ -106,6 +109,7 @@ def findRUL(request):
         "batteries" : name_all, 
         "eol_value" : eol_actual_all,
         "is_eol" : eol_bool_all,
+        "cycles" : cycle,
         "x_units": "Charging cycles",
         "y_units": "Capacity"
     }
