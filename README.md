@@ -1,7 +1,7 @@
 ## MoonRaker ML API
 Running
 
-`python moonrakerbackend/manage.py runserver`
+`sudo -E python3 moonrakerbackend/manage.py runserver 0:80`
 
 ## Virtualenv
 Setting up

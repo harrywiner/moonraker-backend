@@ -10,9 +10,10 @@
             "type": "python",
             "request": "launch",
             "program": "./moonrakerbackend/manage.py",
-            "args": ["runserver"],
+            "args": ["runserver", "80"],
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+            "sudo": true
         }
     ]
 }
