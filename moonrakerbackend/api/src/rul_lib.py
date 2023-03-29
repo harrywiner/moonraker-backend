@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
 
+from typing import List
+
+from ..types.data_types import RUL_Prediction
+
 def get_predicted_capacity_feature(predict, backward_window, forward_window):
     backward = [look_back_reversed(backward_window, c, forward_window) for c in predict]
     forward = [look_forward(forward_window, c, backward_window) for c in predict]
@@ -42,16 +46,11 @@ def calculate_eol(predict_y, actual_y, actual_x):
     
     return eol_i_predict, eol_i_actual, eol_actual
 
-def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06", "BAT 07", "BAT 18"], cycle = 0, lookback = 20, forward = 20):
-    y_actual_all = []
-    y_predicted_all = [] 
-    past_all = []
-    eol_i_actual_all = []
-    eol_i_predict_all = []
-    eol_actual_all = []
-    name_all = []
-    eol_bool_all = []
-    for x, y, name, c in zip(xs, ys, bat_names, cycle):
+def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06", "BAT 07", "BAT 18"], cycles = [0,0,0,0], lookback = 20, forward = 20) -> List[RUL_Prediction]:
+
+    predictions = []
+    for x, y, name, c in zip(xs, ys, bat_names, cycles):
+
         backward_indices = [i for i in range(lookback+c)]
         forward_indices = [i for i in range(lookback+c, lookback+forward+c)]
         predict = np.array(model.predict(x))
@@ -71,16 +70,23 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
         eol_i_actual, eol_i_predict, eol_actual = calculate_eol(predict_full, actual_full, past)
         eol_bool = is_eol(past, eol_actual, y_actual)
 
-        y_actual_all.append(y_actual)
-        y_predicted_all.append(y_predicted) 
-        past_all.append(past)
-        eol_i_actual_all.append(eol_i_actual)
-        eol_i_predict_all.append(eol_i_predict)
-        name_all.append(name)
-        eol_actual_all.append(eol_actual)
-        eol_bool_all.append(eol_bool)
+        predictions.append(
+            RUL_Prediction(
+                y_past=past, 
+                y_predicted=y_predicted.tolist(), 
+                y_actual=y_actual.tolist(), 
+                device_name=name, 
+                x_units="Cycles", 
+                y_units="mAh", 
+                x_indices=x_indices.tolist(), 
+                eol_i_predict=eol_i_predict,
+                eol_i_actual=eol_i_actual, 
+                eol_value=eol_actual, 
+                is_eol=eol_bool, 
+                cycle=c)
+            )
 
-    return x_indices, y_actual_all, y_predicted_all, past_all, eol_i_actual_all, eol_i_predict_all, name_all, eol_actual_all, eol_bool_all
+    return predictions
 
 def is_eol(past, eol_actual, actual_y):
     # if the past contains eol_actual
