@@ -31,7 +31,7 @@ def look_back_reversed(n, data, truncate_future):
 def find_eol(vector, eol_actual):
     # Find first cycle that passes EOL threshold
     for i in range(len(vector) - 1):
-        if (vector[i] > eol_actual and vector[i+1] < eol_actual):
+        if (vector[i] > eol_actual and vector[i+1] <= eol_actual):
             # print("First capacity that passes threshold:", vector[i])
             return i+1
     # return -1 if in the future
