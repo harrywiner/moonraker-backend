@@ -83,7 +83,7 @@ def get_prediction_at_single_cycle(model, xs, ys, bat_names=["BAT 05", "BAT 06",
                 eol_i_actual=eol_i_actual, 
                 eol_value=eol_actual, 
                 is_eol=eol_bool, 
-                cycle=c)
+                cycle= x_indices.tolist()[len(past)] - 1)
             )
 
     return predictions

@@ -91,7 +91,11 @@ def findRUL(request):
     predict_set = clean_data(deserialized_data)
 
     # get predicted forward and backward
-    backward, forward = get_predicted_capacity_feature(predict_set, 20, 20)
+
+    LOOK_BACK = 20
+    LOOK_FORWARD = 20
+
+    backward, forward = get_predicted_capacity_feature(predict_set, LOOK_BACK, LOOK_FORWARD)
 
     # load model 
     rul_lstm = load_model('moonrakerbackend/api/models/RUL_LSTM_test10.h5')
