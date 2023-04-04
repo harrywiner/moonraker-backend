@@ -4,6 +4,8 @@ from api.src.format import deserialize_input, map_aggregates_to_samples, is_vali
 from api.src.ae_lib import get_sample_loss, find_zscore_anomalies
 from api.src.cap_lib import clean_data
 from api.src.rul_lib import get_predicted_capacity_feature, get_prediction_at_single_cycle
+from api.types.data_types import SOC_Prediction
+from api.src.soc_predictor_lib import read_data, train_test_ratio, get_soc_prediction
 
 from tensorflow.keras.models import load_model
 import numpy as np
@@ -98,5 +100,24 @@ def findRUL(request):
     
     # find prediction
     predictions = get_prediction_at_single_cycle(rul_lstm, backward, forward, cycles = cycle)
+
+    return Response([p.dict() for p in predictions])
+
+@api_view(['POST'])
+def predictSOC(request) -> SOC_Prediction:
+    if 't' not in request.query_params.keys():
+        cycle = [90]*4
+    else:
+        t = request.query_params['t']
+        if t.isnumeric() == True:
+            cycle = [int(t)]*4
+        else:
+            cycle = ast.literal_eval(t)
+
+    calculated_cap = read_data('./data/calculated_cap.csv')
+
+    train_x, train_y, test_x, test_y = train_test_ratio(calculated_cap)
+
+    predictions = get_soc_prediction(train_x, train_y, test_x, test_y, cycles = cycle)
 
     return Response([p.dict() for p in predictions])
