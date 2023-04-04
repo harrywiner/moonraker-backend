@@ -114,7 +114,8 @@ def predictSOC(request) -> SOC_Prediction:
         else:
             cycle = ast.literal_eval(t)
 
-    calculated_cap = read_data('./data/calculated_cap.csv')
+    files = ['calculated_cap_BAT 05.csv', 'calculated_cap_BAT 06.csv', 'calculated_cap_BAT 07.csv', 'calculated_cap_BAT 18.csv']
+    calculated_cap = [read_data(file_name) for file_name in files]
 
     train_x, train_y, test_x, test_y = train_test_ratio(calculated_cap)
 

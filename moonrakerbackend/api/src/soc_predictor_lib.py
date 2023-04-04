@@ -12,19 +12,14 @@ def read_data(file_name):
     delimiter = ','
     with open(file_name, 'r') as f:
         reader = csv.reader(f, delimiter=delimiter)
-        all_data = []
         bat = []
         for row in reader:
-            if row != []:
-                cycle = []
-                for i in row:
-                    timesteps = np.fromstring(i.strip('[]'), sep=' ')
-                    cycle.append(timesteps)
-                bat.append(cycle)
-            else:
-                all_data.append(bat)
-                bat = []
-    return all_data
+            cycle = []
+            for i in row:
+                timesteps = np.fromstring(i.strip('[]'), sep=' ')
+                cycle.append(timesteps)
+            bat.append(cycle)
+    return bat
 
 def train_test_ratio(features, ratio = .1):
     all_train_x, all_train_y, all_test_x, all_test_y  = [], [], [], []
