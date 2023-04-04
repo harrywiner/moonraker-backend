@@ -54,19 +54,17 @@ def train_test_ratio(features, ratio = .1):
 def get_soc_prediction(train_x, train_y, time, soc, bat_names=["BAT 05", "BAT 06", "BAT 07", "BAT18"], cycles= [0,0,0,0]) -> List[SOC_Prediction]:
     predictions = []
     for xs, ys, name, t_x, t_y, c in zip(time, soc, bat_names, train_x, train_y, cycles):
-        bat_predicted_output = []
-        for x, t, s in zip(xs, t_x, t_y):
-            x = x.reshape((-1, 1))
-            reg = LinearRegression()
-            t = t.reshape((-1, 1))
-            reg.fit(t, s)
-            predict_y = reg.predict(x)
-            predict_y = [i if i > 0 else 0 for i in predict_y]
-            bat_predicted_output.append(predict_y)
+        x = xs[c].reshape((-1, 1))
+        reg = LinearRegression()
+        t = t_x[c].reshape((-1, 1))
+        s = t_y[c]
+        reg.fit(t, s)
+        predict_y = reg.predict(x)
+        predict_y = [i if i > 0 else 0 for i in predict_y]
         
         eol_actual = 0
         
-        x_predict = find_eol(bat_predicted_output[c], eol_actual)
+        x_predict = find_eol(predict_y, eol_actual)
         eol_i_predict = xs[c][x_predict]
 
         x_actual = find_eol(ys[c], eol_actual)
@@ -77,7 +75,7 @@ def get_soc_prediction(train_x, train_y, time, soc, bat_names=["BAT 05", "BAT 06
         predictions.append(
             SOC_Prediction(
                 y_past=t_y[c].tolist(),
-                y_predicted=bat_predicted_output[c],
+                y_predicted=predict_y,
                 y_actual=ys[c].tolist(),
                 device_name=name, 
                 x_units="Time(s)",
