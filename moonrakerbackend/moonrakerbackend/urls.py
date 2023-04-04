@@ -25,6 +25,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include('api.urls')),
     # path("api_schema/", schema_view),
-    path("api_schema/", get_schema_view(title='API Schema', description='Guide for the REST API')),
-    path("swagger_ui/", TemplateView.as_view(template_name='docs.html', extra_context={'schema_url':'api_schema'}), name='swagger-ui')
+    path("api_schema/", get_schema_view(title='MoonRaker Backend', description='Guide for the REST API')),
+    path("", TemplateView.as_view(template_name='docs.html', extra_context={'schema_url':'api_schema'}))
 ]
