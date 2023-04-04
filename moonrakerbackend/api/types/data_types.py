@@ -15,6 +15,9 @@ class Prediction(BaseModel):
     y_units: str
     x_indices: List[float]
 
+class SOC_Prediction(Prediction): 
+    time_to_empty_actual: int # seconds
+    time_to_empty_predicted: int
 
 class RUL_Prediction(Prediction):
     eol_i_predict: int
