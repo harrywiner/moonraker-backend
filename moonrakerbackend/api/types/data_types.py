@@ -18,6 +18,7 @@ class Prediction(BaseModel):
 class SOC_Prediction(Prediction): 
     time_to_empty_actual: int # seconds
     time_to_empty_predicted: int
+    start_of_cycle: int
 
 class RUL_Prediction(Prediction):
     eol_i_predict: int

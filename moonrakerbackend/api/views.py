@@ -105,19 +105,19 @@ def findRUL(request):
 
 @api_view(['POST'])
 def predictSOC(request) -> SOC_Prediction:
-    if 't' not in request.query_params.keys():
-        cycle = [90]*4
+    if 's' not in request.query_params.keys():
+        start_charge = [80]*4
     else:
-        t = request.query_params['t']
-        if t.isnumeric() == True:
-            cycle = [int(t)]*4
+        s = request.query_params['s']
+        if s.isnumeric() == True:
+            start_charge = [int(s)]*4
         else:
-            cycle = ast.literal_eval(t)
+            start_charge = ast.literal_eval(s)
 
-    calculated_cap = read_data('./data/calculated_cap.csv')
+    calculated_cap = [i for i in read_data('./data/calculated_cap.csv')]
 
-    train_x, train_y, test_x, test_y = train_test_ratio(calculated_cap)
+    train_x, train_y, test_x, test_y = train_test_ratio(calculated_cap, start_charge = start_charge)
 
-    predictions = get_soc_prediction(train_x, train_y, test_x, test_y, cycles = cycle)
+    predictions = get_soc_prediction(train_x, train_y, test_x, test_y, start_charge = start_charge)
 
     return Response([p.dict() for p in predictions])
