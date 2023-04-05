@@ -29,10 +29,10 @@ def read_data(file_name):
 def train_test_ratio(features, start_charge, ratio = .1):
     all_train_x, all_train_y, all_test_x, all_test_y  = [], [], [], []
     for bat, s_c in zip(features, start_charge):
-        split = int(len(bat)*ratio)
         cycle = np.array(bat)
         start_i = find_eol(cycle[:, 1], s_c)
         bat = bat[start_i:]
+        split = int(len(bat)*ratio)
         train_val = bat[:split]
         test_val = bat[split:]
         train_x = np.array(train_val)[:, 0]
